@@ -9,6 +9,9 @@ will hear about it: a logbook rumour reports that Terran engineers are trying
 to revive an ancient ATF battleship design. Set the delay high enough, and the
 lost art stays lost.
 
+Player-owned shipyards are unaffected, and player-built Asgards are never delayed.
+Self-imposed handicaps are left to the player; this mod only limits NPC Terran faction AI.
+
 ## Why
 
 In vanilla, losing an Asgard costs the Terran Protectorate about one minute of
