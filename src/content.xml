@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<content
+  id="vas_asgard_build_limiter"
+  name="[VAS] Asgard Build Limiter"
+  description="Limits Terran AI Asgard construction by refusing new Asgard job build orders until a configurable cooldown has elapsed."
+  author="VasiliyTemniy"
+  version="100"
+  date="2026-06-12"
+  save="0">
+  <dependency id="ego_dlc_terran" optional="false" name="Cradle of Humanity"/>
+  <dependency id="ws_2042901274" optional="false" name="SirNukes Mod Support APIs"/>
+</content>

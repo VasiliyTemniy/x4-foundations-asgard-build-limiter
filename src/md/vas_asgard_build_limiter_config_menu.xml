@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mdscript name="VAS_AsgardBuildLimiter" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="md.xsd">
+  <cues>
+    <cue name="ModConfig" namespace="this">
+      <actions>
+        <run_actions ref="SeedDefaults"/>
+      </actions>
+    </cue>
+
+    <library name="SeedDefaults" purpose="run_actions">
+      <actions>
+        <do_if value="(@md.VAS_AsgardBuildLimiter.ModConfig.$enabled + '') == 'null'">
+          <set_value name="md.VAS_AsgardBuildLimiter.ModConfig.$enabled" exact="true"/>
+        </do_if>
+        <do_if value="(@md.VAS_AsgardBuildLimiter.ModConfig.$cooldownMinutes + '') == 'null'">
+          <set_value name="md.VAS_AsgardBuildLimiter.ModConfig.$cooldownMinutes" exact="120"/>
+        </do_if>
+      </actions>
+    </library>
+
+    <!-- event_universe_generated fires both at new-game start AND on every
+         savegame load (md.xsd), so it alone covers all sessions - adding
+         event_game_loaded would double-fire this cue on loads. -->
+    <cue name="InitDefaults" instantiate="true">
+      <conditions>
+        <event_universe_generated/>
+      </conditions>
+      <actions>
+        <run_actions ref="SeedDefaults"/>
+      </actions>
+    </cue>
+
+    <cue name="StartSMO" instantiate="true">
+      <conditions>
+        <event_cue_signalled cue="md.Simple_Menu_Options.Reloaded"/>
+      </conditions>
+      <actions>
+        <signal_cue_instantly cue="md.Simple_Menu_API.Register_Options_Menu" param="table[
+          $id = 'vas_abl_options_menu',
+          $columns = 3,
+          $title = {2026061101,1},
+          $onOpen = BuildOptionsMenu,
+        ]"/>
+        <cancel_cue cue="this"/>
+      </actions>
+    </cue>
+
+    <cue name="BuildOptionsMenu" instantiate="true">
+      <conditions>
+        <event_cue_signalled/>
+      </conditions>
+      <actions>
+        <!-- run_actions, NOT include_actions: a purpose="run_actions" library is
+             only callable via run_actions; the engine rejects the whole script
+             otherwise (md.xsd librarypurpose). -->
+        <run_actions ref="SeedDefaults"/>
+
+        <signal_cue_instantly cue="md.Simple_Menu_API.Call_Table_Method" param="table[
+          $method = 'setColWidth',
+          $col = 1,
+          $width = 'Helper.standardButtonHeight',
+        ]"/>
+
+        <signal_cue_instantly cue="md.Simple_Menu_API.Add_Row"/>
+        <signal_cue_instantly cue="md.Simple_Menu_API.Make_CheckBox" param="table[
+          $id = 'enabled',
+          $checked = md.VAS_AsgardBuildLimiter.ModConfig.$enabled,
+          $col = 1,
+          $width = 'Helper.standardButtonHeight',
+          $height = 'Helper.standardButtonHeight',
+          $onClick = OnOptionsCheckboxChanged,
+        ]"/>
+        <signal_cue_instantly cue="md.Simple_Menu_API.Make_Text" param="table[
+          $col = 2,
+          $colSpan = 2,
+          $text = {2026061101,2},
+        ]"/>
+
+        <signal_cue_instantly cue="md.Simple_Menu_API.Add_Row"/>
+        <signal_cue_instantly cue="md.Simple_Menu_API.Make_Text" param="table[
+          $col = 1,
+          $colSpan = 2,
+          $text = {2026061101,3},
+        ]"/>
+        <signal_cue_instantly cue="md.Simple_Menu_API.Make_Slider" param="table[
+          $col = 3,
+          $id = 'cooldownMinutes',
+          $echo = 'cooldownMinutes',
+          $height = 'Helper.slidercellMinHeight',
+          $min = 1,
+          $max = 1000000,
+          $step = 1,
+          $start = md.VAS_AsgardBuildLimiter.ModConfig.$cooldownMinutes,
+          $suffix = ' min',
+          $onSliderCellConfirm = OnOptionsSliderChanged,
+        ]"/>
+      </actions>
+    </cue>
+
+    <cue name="OnOptionsCheckboxChanged" instantiate="true">
+      <conditions>
+        <event_cue_signalled/>
+      </conditions>
+      <actions>
+        <set_value name="md.VAS_AsgardBuildLimiter.ModConfig.{'$' + event.param.$id}" exact="event.param.$checked"/>
+        <cancel_cue cue="this"/>
+      </actions>
+    </cue>
+
+    <cue name="OnOptionsSliderChanged" instantiate="true">
+      <conditions>
+        <event_cue_signalled/>
+      </conditions>
+      <actions>
+        <do_if value="event.param.$echo == 'cooldownMinutes'">
+          <set_value name="md.VAS_AsgardBuildLimiter.ModConfig.$cooldownMinutes" exact="event.param.$value"/>
+        </do_if>
+        <cancel_cue cue="this"/>
+      </actions>
+    </cue>
+  </cues>
+</mdscript>

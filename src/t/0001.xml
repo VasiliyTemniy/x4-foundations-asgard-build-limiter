@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<language>
+  <page id="2026061101" title="[VAS] Asgard Build Limiter" descr="0" voice="no">
+    <!-- Title -->
+    <t id="1">Asgard Build Limiter</t>
+
+    <!-- Config -->
+    <t id="2">Enable Terran AI Asgard build limiter</t>
+    <t id="3">Asgard build cooldown</t>
+
+    <!-- Ingame logbook - reserved 10-199 -->
+    <!-- В деревнях говорят, что видели отряд Крысы в этих краях... -->
+    <t id="10">Terran shipyard rumours</t>
+    <t id="11">Rumours from Protectorate shipyards suggest that engineers are trying to revive an ancient ATF battleship design. The old knowledge is scarce, and the work is expected to take time.</t>
+  </page>
+</language>

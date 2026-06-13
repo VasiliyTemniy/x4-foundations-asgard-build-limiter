@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<diff>
+  <add sel="//debug_text[contains(@text, &quot;wants to build&quot;)]" pos="after">
+    <set_value name="$asgardSpottedWhenModEnabled" exact="
+      $ShipToBuild.macro.ismacro.{macro.ship_atf_xl_battleship_01_a_macro}
+      and (((@md.VAS_AsgardBuildLimiter.ModConfig.$enabled + '') == 'null')
+           or @md.VAS_AsgardBuildLimiter.ModConfig.$enabled)"
+    />
+    <do_if value="
+      $asgardSpottedWhenModEnabled
+      and ((@player.entity.$vas_abl_asgard_build_delay_started_at + '') == 'null')"
+    >
+      <set_value name="player.entity.$vas_abl_asgard_build_delay_started_at" exact="player.age"/>
+      <debug_to_file
+        text="'[' + player.age + '] Terrans want to build Asgard! Starting build delay timer. delayStartedAt=' + player.entity.$vas_abl_asgard_build_delay_started_at + ', cooldownMinutes=' + md.VAS_AsgardBuildLimiter.ModConfig.$cooldownMinutes"
+        chance="100"
+        directory="'VAS_AsgardBuildLimiter'"
+        name="'limiter.txt'"
+        output="false"
+        append="true"
+      />
+      <write_to_logbook category="news" title="{2026061101,10}" text="{2026061101,11}"/>
+    </do_if>
+    <do_if value="
+      $asgardSpottedWhenModEnabled
+      and ((@player.entity.$vas_abl_asgard_build_delay_started_at + '') != 'null')
+      and player.age lt (
+        player.entity.$vas_abl_asgard_build_delay_started_at
+        + ((if ((@md.VAS_AsgardBuildLimiter.ModConfig.$cooldownMinutes + '') == 'null')
+            then 120
+            else md.VAS_AsgardBuildLimiter.ModConfig.$cooldownMinutes) * 1min)
+      )
+    ">
+      <continue/>
+    </do_if>
+  </add>
+
+  <add sel="//add_build_to_construct_ship[@result='$Build' and @buildobject='$ShipToBuild']" pos="after">
+    <do_if value="$Build and $ShipToBuild.macro.ismacro.{macro.ship_atf_xl_battleship_01_a_macro}">
+      <debug_to_file
+        text="'[' + player.age + '] Terrans have created an order to build Asgard! Clearing build delay timer...'"
+        chance="100"
+        directory="'VAS_AsgardBuildLimiter'"
+        name="'limiter.txt'"
+        output="false"
+        append="true"
+      />
+      <set_value name="player.entity.$vas_abl_asgard_build_delay_started_at" exact="null"/>
+    </do_if>
+  </add>
+</diff>
